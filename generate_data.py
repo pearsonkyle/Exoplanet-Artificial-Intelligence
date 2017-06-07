@@ -16,8 +16,8 @@ class dataGenerator(object):
         self.keys = list(self.pgrid.keys())
 
         # generate time
-        npts = settings['ws']/settings['dt']
-        hw = (0.5*npts*settings['dt'])/60./24.
+        npts = self.settings['ws']/self.settings['dt']
+        hw = (0.5*npts*self.settings['dt'])/60./24.
         self.t = np.linspace( 1-hw,1+hw,npts )
 
 
