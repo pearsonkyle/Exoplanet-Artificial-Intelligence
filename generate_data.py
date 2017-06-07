@@ -1,8 +1,10 @@
+import pickle
 import numpy as np
 from ELCA import transit
-from itertools import product
 import multiprocessing as mp
-import pickle
+from itertools import product
+from sklearn import preprocessing
+
 np.random.seed(1337)
 
 class dataGenerator(object):
@@ -57,6 +59,25 @@ class dataGenerator(object):
         # split up the results
         #self.pvals,self.transits,self.null = zip(*results)
         #self.pvals = results[:,0]
+
+        
+arr = lambda x : np.array( list(x),dtype=np.float )
+def load_data(fname='transit_data_train.pkl',categorical=False,whiten=True,DIR='pickle_data/'):
+
+    data = pickle.load(open(DIR+fname,'rb'))
+
+    # convert to numpy array fo float type from object type
+    pvals = arr(data['results'][:,0])
+    transits = arr(data['results'][:,1])
+    null = arr(data['results'][:,2])
+
+    X = np.vstack([transits,null])
+    y = np.hstack([np.ones(transits.shape[0]), np.zeros(null.shape[0])] )
+
+    if categorical: y = np_utils.to_categorical(y, np.unique(y).shape[0] )
+    if whiten: X = preprocessing.scale(X,axis=1)
+
+    return X,y,pvals,data['keys'],data['time']
 
 
 if __name__ == "__main__":
