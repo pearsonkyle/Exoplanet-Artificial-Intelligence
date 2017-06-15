@@ -133,12 +133,9 @@ if __name__ == "__main__":
     }
 
 
-
-
     data = dataGenerator(**{'pgrid':pgrid,'settings':settings,'init':init})
     data.generate()
 
-    import pickle
     pickle.dump({'keys':data.keys,'results':data.results,'time':data.t}, open('pickle_data/transit_data_train.pkl','wb'))
 
     print('number of samples:',len(data.results))
