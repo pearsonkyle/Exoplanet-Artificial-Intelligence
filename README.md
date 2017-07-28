@@ -7,6 +7,7 @@ arXiv: https://arxiv.org/abs/1706.04319
 This project uses machine learning to search for transiting exoplanets in planetary search surveys. Multiple neural networks (MLP, CNN, Wavelet MLP) are trained to recognize patterns from artificial light curves that mimic real observations. The trained networks are validated with real data using the known ephemerii of transiting planets discovered from the [Kepler](https://www.nasa.gov/mission_pages/kepler/main/index.html) mission.
 
 Dependencies: 
+  * [Python3](https://www.continuum.io/downloads)
   * [Numpy](http://www.numpy.org/)
   * [Keras](https://keras.io/)
   * [TensorFlow](https://www.tensorflow.org/)
