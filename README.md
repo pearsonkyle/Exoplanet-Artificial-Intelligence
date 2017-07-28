@@ -12,9 +12,10 @@ Dependencies:
   * [TensorFlow](https://www.tensorflow.org/)
   * [Matplotlib](https://matplotlib.org/)
   * [Scikit-learn](http://scikit-learn.org/stable/)
+  * [PyWavelets](https://pywavelets.readthedocs.io/en/latest/)
   * [Exoplanet Light Curve Analysis](https://github.com/pearsonkyle/Exoplanet-Light-Curve-Analysis)
 
 ## Comprehensive File Guide 
 `generate_data.py` - generates over 300,000 training and test samples from the parameter space grid in Table 1. 
-
+`model_fit_history` - creation of each neural network and training. The training performance per epoch is saved and was used to create Figure 6. 
 Files will be released upon publication
