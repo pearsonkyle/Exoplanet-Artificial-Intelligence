@@ -1,6 +1,6 @@
 # Searching for Exoplanets using Artificial Intelligence
 
-White Paper Link: (Currently in review at MNRAS) 
+White Paper Link: https://academic.oup.com/mnras/article/doi/10.1093/mnras/stx2761/4564439/Searching-for-Exoplanets-using-Artificial 
 
 arXiv: https://arxiv.org/abs/1706.04319
 
