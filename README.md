@@ -19,6 +19,29 @@ Dependencies:
 ## Getting started
 It depends what you're interested in doing.. I would reccomend reading through the paper to get a general feel for what the code is doing. This particular machine learning algorithm is basically a glorified pattern recognition algorithm designed to recognize light curve shapes in photometric time series. I tried to include all of the relavant scripts that went into making this paper and their descriptions are below. If you have a question about anything please feel free to email me!
 
+## Citation
+If you use any of these algorithms in your research please cite this github repository using the article below 
+
+Pearson K. A., Palafox L., Griffith C. A., 2018, MNRAS, 474, 478
+
+Here is an example bibtex
+```
+@ARTICLE{Pearson2018,
+   author = {{Pearson}, K.~A. and {Palafox}, L. and {Griffith}, C.~A.},
+    title = "{Searching for exoplanets using artificial intelligence}",
+  journal = {\mnras},
+archivePrefix = "arXiv",
+   eprint = {1706.04319},
+ primaryClass = "astro-ph.IM",
+     year = 2018,
+    month = feb,
+   volume = 474,
+    pages = {478-491},
+      doi = {10.1093/mnras/stx2761},
+   adsurl = {http://adsabs.harvard.edu/abs/2018MNRAS.474..478P},
+  adsnote = {Provided by the SAO/NASA Astrophysics Data System}
+}
+```
 
 ## Comprehensive File Guide 
 `generate_data.py` - generates over 300,000 training and test samples from the parameter space grid in Table 1.
