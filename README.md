@@ -71,4 +71,4 @@ Use a 2D CNN with phase folded light curves to detect periodic signals (think Pe
 Using this to detect exoplanet transits in the next generation of transit survey (e.g. TESS). 
 
 ## Comparison
-[Here](https://github.com/pearsonkyle/Exoplanet-Artificial-Intelligence/blob/master/shallue_vanderburg_recreation.py) is a keras recreation of the tensorflow code in [Shallue & Vanderburg 2018](https://iopscience.iop.org/article/10.3847/1538-3881/aa9e09/meta). I found the original code pretty hard to modify and work with in a scriptable interface so here it is for your basic needs. Here is the original code: https://github.com/google-research/exoplanet-ml 
+[Here](https://github.com/pearsonkyle/Exoplanet-Artificial-Intelligence/blob/master/shallue_vanderburg_recreation.py) is a keras recreation of the tensorflow code in [Shallue & Vanderburg 2018](https://iopscience.iop.org/article/10.3847/1538-3881/aa9e09/meta). I found the original code pretty hard to modify and work with in a scriptable interface. Here is the original code for reference: https://github.com/google-research/exoplanet-ml 
