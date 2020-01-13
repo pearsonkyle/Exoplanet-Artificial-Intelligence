@@ -3,10 +3,9 @@ import pickle
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn import preprocessing
-from keras.models import load_model 
-from keras.layers import Input, Dense, Conv1D, AveragePooling1D, Concatenate, Flatten, Dropout
-from keras.models import Model
-from keras.optimizers import SGD
+from tensorflow.keras.layers import Input, Dense, Conv1D, AveragePooling1D, Concatenate, Flatten, Dropout
+from tensorflow.keras.models import Model
+from tensorflow.keras.optimizers import SGD
 
 from ELCA import lc_fitter, transit
 
@@ -24,7 +23,6 @@ def pn_rates(model,X,y):
     fp = np.sum(y_pred[neg_idx]==1)/y_pred.shape[0]
 
     return fn,fp
-
 
 def make_cnn(maxlen):
     
@@ -157,8 +155,6 @@ if __name__ == "__main__":
         residuals = sv['residual']
         times = sv['time']
 
-
-
     # create some random data yo
     pars = {'ar': 15.9187, 'u1': 0.4242, 'u2': 0.1400, 'inc': 89.325, 'ecc': 0, 'ome': 0, 'a0': 1, 'a1': 0, 'a2': 0}
 
@@ -178,6 +174,8 @@ if __name__ == "__main__":
     cnn = make_cnn(180)
     history = cnn.fit(X, y, batch_size=batch_size, epochs=nb_epoch,
               verbose=1, validation_split=0.0, validation_data=None)
+
+    cnn.save_weights('tess_cnn1d.h5')
 
     score = cnn.evaluate(X, y, verbose=1)
     fn,fp = pn_rates(cnn,X,y)
