@@ -3,7 +3,7 @@
 ## Getting started
 
 I have provided extracted TESS light curves and residuals in the file: `TESS_residuals.pkl`. The data is a dictionary 
-with the fields ```{'tic':[],'time':[],'residual':[], 'fluxs':[]}```. See the file `cnn_train.py` for how to create training data based on real noise from TESS. If you use these algorithmspPlease cite: Pearson 2019 https://iopscience.iop.org/article/10.3847/1538-3881/ab4e1c 
+with the fields ```{'tic':[],'time':[],'residual':[], 'fluxs':[]}```. See the file `cnn_train.py` for how to create training data based on real noise from TESS. If you use these algorithms please cite: Pearson 2019 https://iopscience.iop.org/article/10.3847/1538-3881/ab4e1c 
 
 ![](tess_ai_recovery.png)
 
