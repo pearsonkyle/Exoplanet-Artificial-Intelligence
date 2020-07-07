@@ -2,6 +2,7 @@ import os
 import pickle
 import numpy as np
 import matplotlib.pyplot as plt
+import random
 from sklearn import preprocessing
 from tensorflow.keras.layers import Input, Dense, Conv1D, AveragePooling1D, Concatenate, Flatten, Dropout
 from tensorflow.keras.models import Model
@@ -71,8 +72,34 @@ def generate_negatives(residuals, N=10000):
 
     return negative 
 
-def generate_positives(residuals, pars, N=10000, minsnr=1.5, snrscale=2):
+def generate_perlin_noise_2d(shape, res):
+    def f(t):
+        return 6*t**5 - 15*t**4 + 10*t**3
+    
+    delta = (res[0] / shape[0], res[1] / shape[1])
+    d = (shape[0] // res[0], shape[1] // res[1])
+    grid = np.mgrid[0:res[0]:delta[0],0:res[1]:delta[1]].transpose(1, 2, 0) % 1
+    # Gradients
+    angles = 2*np.pi*np.random.rand(res[0]+1, res[1]+1)
+    gradients = np.dstack((np.cos(angles), np.sin(angles)))
+    g00 = gradients[0:-1,0:-1].repeat(d[0], 0).repeat(d[1], 1)
+    g10 = gradients[1:  ,0:-1].repeat(d[0], 0).repeat(d[1], 1)
+    g01 = gradients[0:-1,1:  ].repeat(d[0], 0).repeat(d[1], 1)
+    g11 = gradients[1:  ,1:  ].repeat(d[0], 0).repeat(d[1], 1)
+    # Ramps
+    n00 = np.sum(np.dstack((grid[:,:,0]  , grid[:,:,1]  )) * g00, 2)
+    n10 = np.sum(np.dstack((grid[:,:,0]-1, grid[:,:,1]  )) * g10, 2)
+    n01 = np.sum(np.dstack((grid[:,:,0]  , grid[:,:,1]-1)) * g01, 2)
+    n11 = np.sum(np.dstack((grid[:,:,0]-1, grid[:,:,1]-1)) * g11, 2)
+    # Interpolation
+    t = f(grid)
+    n0 = n00*(1-t[:,:,0]) + t[:,:,0]*n10
+    n1 = n01*(1-t[:,:,0]) + t[:,:,0]*n11
+    return np.sqrt(2)*((1-t[:,:,1])*n0 + t[:,:,1]*n1)
+
+def generate_positives(residuals, pars, N=10000, minsnr=1.5, snrscale=2, sys = False, p=0):
     positive = []
+    positivenopreproc = []
     snrs = []
 
     # generate some positive examples 
@@ -112,11 +139,28 @@ def generate_positives(residuals, pars, N=10000, minsnr=1.5, snrscale=2):
             tlength = (tmodel!=1).sum()
 
         # create data and assess transit probability 
-        data = residuals[di][tmask] * tmodel    
+        data = residuals[di][tmask] * tmodel 
+        if sys == True:
+            systematics = np.zeros_like(data)
+            if np.random.uniform()<p:
+                i=180
+                while i>169 or i<9:
+                    i=np.floor(np.random.uniform()*len(systematics))
+                i=int(i)
+                plus=random.uniform(0.005,0.008)
+                for elem in range(i-10,i-1):
+                    systematics[elem]+=plus
+                    plus+=.0001
+                for elem in range(i,i+10):
+                    systematics[elem]+=plus
+                    plus-=.0001
+
+            data = residuals[di][tmask] * tmodel + systematics  
         pdata = preprocessing.scale( data )
         positive.append(pdata)
+        positivenopreproc.append(data)
 
-    return snrs, positive 
+    return snrs, positive
 
 if __name__ == "__main__":
     
@@ -157,13 +201,21 @@ if __name__ == "__main__":
 
     # create some random data yo
     pars = {'ar': 15.9187, 'u1': 0.4242, 'u2': 0.1400, 'inc': 89.325, 'ecc': 0, 'ome': 0, 'a0': 1, 'a1': 0, 'a2': 0}
+    perlin2d  = generate_perlin_noise_2d((180, 180), (2,2))/10
+
 
     # create training data 
     #negative = generate_negatives(data, residuals, 10000)
-    snrs, positive = generate_positives(residuals, pars, 20000, minsnr=1, snrscale=2)
+    snrs, positive = generate_positives(residuals, pars, 20000, minsnr=1, snrscale=2, sys = True, p=.1)
 
     # create some low snr transits to train on as negative, shouldn't detect a transit beneath the noise
-    snrs2, negative  = generate_positives(residuals, pars, 20000, minsnr=-1, snrscale=1.25)
+    snrs2, negative  = generate_positives(residuals, pars, 20000, minsnr=-1, snrscale=1.25, sys = True, p=.2) 
+
+    prand = random.randint(0,179)
+    nrand = random.randint(0,179)
+
+    positive=positive+perlin2d[prand]
+    negative+=perlin2d[nrand]
 
     X = np.vstack([positive, negative])
     X = X.reshape((X.shape[0], X.shape[1], 1))
@@ -186,8 +238,8 @@ if __name__ == "__main__":
 
     # test the network 
     negative = generate_negatives( residuals, 10000)
-    snrs, positive = generate_positives( residuals, pars, 10000, minsnr=0.05, snrscale=2)
-    snrs2, negative  = generate_positives( residuals, pars, 10000, minsnr=-1, snrscale=1)
+    snrs, positive = generate_positives( residuals, pars, 10000, minsnr=0.05, snrscale=2, sys = True, p=.008)
+    snrs2, negative  = generate_positives( residuals, pars, 10000, minsnr=-1, snrscale=1, sys = True, p=.03)
     Xt = np.vstack([positive,negative])
     Xt = Xt.reshape((Xt.shape[0], Xt.shape[1], 1))
     yt = np.hstack([np.ones(len(positive)), np.zeros(len(negative))])
@@ -203,6 +255,24 @@ if __name__ == "__main__":
     y_neg = cnn.predict(Xt[10000:])
 
 
+    why = cnn.predict(Xt)
+
+    allsnrs = np.hstack([snrs, snrs2])
+    ballsnrs = np.linspace(min(allsnrs),max(allsnrs),51)
+
+    ballsnr = np.zeros(50)
+    ballavg = np.zeros(50)
+    ballstd = np.zeros(50)
+    ballacc = np.zeros(50)
+    for i in range(ballsnr.shape[0]):
+        mask = (allsnrs > ballsnrs[i] ) & (allsnrs<ballsnrs[i+1])
+        ballavg[i] = np.mean( np.array(why)[mask] )
+        ballsnr[i] = np.mean( np.array(allsnrs)[mask] )
+        ballstd[i] = np.std( np.array(why)[mask] )
+        ballacc[i] = cnn.evaluate(Xt[mask], yt[mask], verbose = 1)[1]
+    plt.errorbar(ballsnr,ballacc,yerr=ballstd,ls='none',marker='.',color='black',alpha=0.75)
+    # plt.savefig("binperlin.png")
+    plt.close()
 
 
     plt.plot( snrs, y_pos[:,0],'g.',label='Test Positive',alpha=0.5)
